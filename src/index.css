@@ -207,4 +207,70 @@
   .transition-bounce {
     transition: var(--transition-bounce);
   }
+
+  /* Enhanced Button Animations */
+  .btn-animated {
+    @apply transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg;
+  }
+
+  .btn-animated:active {
+    @apply scale-95;
+  }
+
+  /* Filter Fade Animation */
+  .filter-fade {
+    @apply transition-all duration-500 ease-in-out;
+  }
+
+  /* Smooth Modal Animations */
+  .modal-overlay {
+    @apply transition-opacity duration-300 ease-in-out;
+  }
+
+  .modal-content {
+    @apply transition-all duration-300 ease-out transform;
+  }
+
+  /* Enhanced Card Hover Effects */
+  .card-interactive {
+    @apply transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-xl hover:border-primary/20;
+  }
+
+  /* Staggered Animation for Lists */
+  .list-item {
+    @apply transition-all duration-300 ease-in-out;
+    animation: slideInUp 0.3s ease-out forwards;
+  }
+
+  .list-item:nth-child(1) { animation-delay: 0.1s; }
+  .list-item:nth-child(2) { animation-delay: 0.2s; }
+  .list-item:nth-child(3) { animation-delay: 0.3s; }
+  .list-item:nth-child(4) { animation-delay: 0.4s; }
+  .list-item:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Loading States */
+  .loading-shimmer {
+    background: linear-gradient(90deg, 
+      hsl(var(--muted)) 25%, 
+      hsl(var(--accent)) 50%, 
+      hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 }

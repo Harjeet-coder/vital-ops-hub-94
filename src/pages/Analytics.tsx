@@ -79,7 +79,20 @@ const Analytics = () => {
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
-            <Button variant="outline" className="transition-medical">
+            <Button 
+              variant="outline" 
+              className="btn-animated"
+              onClick={() => {
+                // Simulate export functionality
+                const blob = new Blob([JSON.stringify({ type: 'Analytics Report', data: 'sample' })], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'analytics-report.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>

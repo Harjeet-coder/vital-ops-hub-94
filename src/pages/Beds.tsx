@@ -4,39 +4,61 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bed, Search, Filter, Eye, MapPin } from "lucide-react";
+import { FloorPlanModal } from "@/components/ui/floor-plan-modal";
+import { PatientAssignmentModal } from "@/components/ui/patient-assignment-modal";
+import { Bed, Search, Filter, Eye, MapPin, UserPlus, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface BedInfo {
-  id: string;
-  ward: string;
-  bedNumber: string;
-  floor: string;
-  type: 'ICU' | 'General' | 'Emergency' | 'Isolation' | 'Private';
-  status: 'available' | 'occupied' | 'maintenance' | 'reserved';
-  patient?: string;
-  department: string;
-}
-
-const beds: BedInfo[] = [
-  { id: '1', ward: 'General Ward A', bedNumber: 'A-15', floor: '3rd', type: 'General', status: 'occupied', patient: 'Jane Smith', department: 'General Medicine' },
-  { id: '2', ward: 'General Ward A', bedNumber: 'A-16', floor: '3rd', type: 'General', status: 'available', department: 'General Medicine' },
-  { id: '3', ward: 'ICU Ward 1', bedNumber: 'I-01', floor: '2nd', type: 'ICU', status: 'occupied', patient: 'John Doe', department: 'ICU' },
-  { id: '4', ward: 'ICU Ward 1', bedNumber: 'I-02', floor: '2nd', type: 'ICU', status: 'available', department: 'ICU' },
-  { id: '5', ward: 'Emergency Ward', bedNumber: 'E-03', floor: '1st', type: 'Emergency', status: 'maintenance', department: 'Emergency' },
-  { id: '6', ward: 'Pediatric Ward', bedNumber: 'P-08', floor: '3rd', type: 'General', status: 'available', department: 'Pediatric' },
-  { id: '7', ward: 'Maternity Ward', bedNumber: 'M-12', floor: '4th', type: 'Private', status: 'occupied', patient: 'Sarah Johnson', department: 'Maternity' },
-  { id: '8', ward: 'Surgical Ward', bedNumber: 'S-05', floor: '2nd', type: 'General', status: 'reserved', department: 'Surgical' },
-  { id: '9', ward: 'Cardiac Unit', bedNumber: 'C-04', floor: '3rd', type: 'ICU', status: 'occupied', patient: 'Robert Lee', department: 'Cardiac' },
-  { id: '10', ward: 'Neurology Ward', bedNumber: 'N-11', floor: '4th', type: 'General', status: 'available', department: 'Neurology' },
-  { id: '11', ward: 'Orthopedic Ward', bedNumber: 'O-07', floor: '3rd', type: 'General', status: 'occupied', patient: 'Maria Garcia', department: 'Orthopedics' },
-  { id: '12', ward: 'Pulmonology Unit', bedNumber: 'PU-03', floor: '4th', type: 'General', status: 'available', department: 'Pulmonology' },
-  { id: '13', ward: 'Oncology Wing', bedNumber: 'ON-09', floor: '5th', type: 'Private', status: 'occupied', patient: 'David Wilson', department: 'Oncology' },
-  { id: '14', ward: 'Burn Unit', bedNumber: 'B-02', floor: '2nd', type: 'ICU', status: 'maintenance', department: 'Burn/Plastic Surgery' },
-  { id: '15', ward: 'Nephrology Ward', bedNumber: 'NE-06', floor: '4th', type: 'General', status: 'available', department: 'Nephrology' },
-];
+import { useHospital } from "@/providers/HospitalProvider";
+import { useState, useMemo } from "react";
 
 const Beds = () => {
+  const { 
+    beds, 
+    searchTerm, 
+    setSearchTerm, 
+    wardFilter, 
+    setWardFilter, 
+    statusFilter, 
+    setStatusFilter,
+    updateBedStatus
+  } = useHospital();
+  
+  const [selectedFloor, setSelectedFloor] = useState<string>('');
+  const [isFloorPlanOpen, setIsFloorPlanOpen] = useState(false);
+  const [isAssignmentOpen, setIsAssignmentOpen] = useState(false);
+  const [selectedBed, setSelectedBed] = useState<{ id: string; bedNumber: string } | null>(null);
+
+  // Filter beds based on search and filters
+  const filteredBeds = useMemo(() => {
+    return beds.filter(bed => {
+      const matchesSearch = searchTerm === '' || 
+        bed.bedNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bed.patient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bed.ward.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesWard = wardFilter === 'all' || 
+        bed.ward.toLowerCase().includes(wardFilter.toLowerCase()) ||
+        bed.department.toLowerCase().includes(wardFilter.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || bed.status === statusFilter;
+      
+      return matchesSearch && matchesWard && matchesStatus;
+    });
+  }, [beds, searchTerm, wardFilter, statusFilter]);
+
+  const handleFloorPlanView = (floor: string) => {
+    setSelectedFloor(floor);
+    setIsFloorPlanOpen(true);
+  };
+
+  const handleAssignPatient = (bedId: string, bedNumber: string) => {
+    setSelectedBed({ id: bedId, bedNumber });
+    setIsAssignmentOpen(true);
+  };
+
+  const handleMaintenanceSchedule = (bedId: string) => {
+    updateBedStatus(bedId, 'maintenance');
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
@@ -83,10 +105,10 @@ const Beds = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant="outline" className="bg-success-light text-success border-success/20">
-              78 Available
+              {filteredBeds.filter(b => b.status === 'available').length} Available
             </Badge>
             <Badge variant="outline" className="bg-destructive-light text-destructive border-destructive/20">
-              118 Occupied
+              {filteredBeds.filter(b => b.status === 'occupied').length} Occupied
             </Badge>
           </div>
         </div>
@@ -100,9 +122,11 @@ const Beds = () => {
                 <Input
                   placeholder="Search by bed number, patient name, or ward..."
                   className="pl-10 transition-medical"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select>
+              <Select value={wardFilter} onValueChange={setWardFilter}>
                 <SelectTrigger className="w-full md:w-48">
                   <SelectValue placeholder="Filter by ward" />
                 </SelectTrigger>
@@ -123,7 +147,7 @@ const Beds = () => {
                   <SelectItem value="nephrology">Nephrology Ward</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-48">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -132,6 +156,7 @@ const Beds = () => {
                   <SelectItem value="available">Available</SelectItem>
                   <SelectItem value="occupied">Occupied</SelectItem>
                   <SelectItem value="maintenance">Maintenance</SelectItem>
+                  <SelectItem value="reserved">Reserved</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" className="transition-medical">
@@ -171,7 +196,11 @@ const Beds = () => {
                     <Badge className="status-maintenance">4</Badge>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full mt-4 transition-medical">
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 btn-animated"
+                  onClick={() => handleFloorPlanView(floor)}
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   View Floor Plan
                 </Button>
@@ -187,16 +216,17 @@ const Beds = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {beds.map((bed) => (
+              {filteredBeds.map((bed, index) => (
                 <div
                   key={bed.id}
                   className={cn(
-                    "p-4 rounded-lg border transition-medical hover:shadow-md cursor-pointer",
+                    "p-4 rounded-lg border card-interactive list-item",
                     bed.status === 'available' && "border-success/20 bg-success-light/30 hover:bg-success-light/50",
                     bed.status === 'occupied' && "border-destructive/20 bg-destructive-light/30 hover:bg-destructive-light/50",
                     bed.status === 'maintenance' && "border-warning/20 bg-warning-light/30 hover:bg-warning-light/50",
                     bed.status === 'reserved' && "border-info/20 bg-info-light/30 hover:bg-info-light/50"
                   )}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
@@ -235,20 +265,47 @@ const Beds = () => {
                   </div>
 
                   {bed.status === 'available' && (
-                    <Button size="sm" className="w-full mt-3 gradient-primary text-primary-foreground">
+                    <Button 
+                      size="sm" 
+                      className="w-full mt-3 btn-animated gradient-primary text-primary-foreground"
+                      onClick={() => handleAssignPatient(bed.id, bed.bedNumber)}
+                    >
+                      <UserPlus className="w-3 h-3 mr-1" />
                       Assign Patient
                     </Button>
                   )}
 
-                  {bed.status === 'occupied' && (
-                    <Button variant="outline" size="sm" className="w-full mt-3 transition-medical">
-                      View Patient
+                  {bed.status === 'occupied' && bed.patient && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full mt-3 btn-animated"
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      View {bed.patient}
                     </Button>
                   )}
 
                   {bed.status === 'maintenance' && (
-                    <Button variant="outline" size="sm" className="w-full mt-3 transition-medical">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full mt-3 btn-animated"
+                      onClick={() => handleMaintenanceSchedule(bed.id)}
+                    >
+                      <Settings className="w-3 h-3 mr-1" />
                       Schedule Repair
+                    </Button>
+                  )}
+
+                  {bed.status === 'reserved' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full mt-3 btn-animated"
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      View Reservation
                     </Button>
                   )}
                 </div>
@@ -256,6 +313,25 @@ const Beds = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Modals */}
+        <FloorPlanModal 
+          isOpen={isFloorPlanOpen}
+          onClose={() => setIsFloorPlanOpen(false)}
+          floor={selectedFloor}
+        />
+        
+        {selectedBed && (
+          <PatientAssignmentModal
+            isOpen={isAssignmentOpen}
+            onClose={() => {
+              setIsAssignmentOpen(false);
+              setSelectedBed(null);
+            }}
+            bedId={selectedBed.id}
+            bedNumber={selectedBed.bedNumber}
+          />
+        )}
       </div>
     </MainLayout>
   );

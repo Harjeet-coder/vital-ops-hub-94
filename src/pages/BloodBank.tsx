@@ -5,34 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ExportModal } from "@/components/ui/export-modal";
 import { Label } from "@/components/ui/label";
-import { Droplets, Plus, Minus, AlertTriangle, Calendar, TrendingDown, Bell } from "lucide-react";
+import { Droplets, Plus, Minus, AlertTriangle, Download, TrendingDown, Calendar } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-interface BloodStock {
-  bloodType: string;
-  units: number;
-  expiryDate: string;
-  status: 'normal' | 'low' | 'critical' | 'expired';
-  lastUpdated: string;
-}
-
-const bloodStock: BloodStock[] = [
-  { bloodType: 'A+', units: 25, expiryDate: '2024-02-15', status: 'normal', lastUpdated: '2024-01-20 10:30' },
-  { bloodType: 'A-', units: 8, expiryDate: '2024-02-10', status: 'low', lastUpdated: '2024-01-20 09:15' },
-  { bloodType: 'B+', units: 32, expiryDate: '2024-02-20', status: 'normal', lastUpdated: '2024-01-20 11:45' },
-  { bloodType: 'B-', units: 5, expiryDate: '2024-02-08', status: 'critical', lastUpdated: '2024-01-20 08:20' },
-  { bloodType: 'AB+', units: 15, expiryDate: '2024-02-18', status: 'normal', lastUpdated: '2024-01-20 12:10' },
-  { bloodType: 'AB-', units: 3, expiryDate: '2024-02-12', status: 'critical', lastUpdated: '2024-01-20 07:55' },
-  { bloodType: 'O+', units: 45, expiryDate: '2024-02-25', status: 'normal', lastUpdated: '2024-01-20 13:30' },
-  { bloodType: 'O-', units: 12, expiryDate: '2024-02-14', status: 'low', lastUpdated: '2024-01-20 14:15' },
-];
+import { useHospital } from "@/providers/HospitalProvider";
 
 const BloodBank = () => {
+  const { bloodStock, addBloodUnits, useBloodUnits } = useHospital();
   const [selectedBloodType, setSelectedBloodType] = useState('');
   const [unitsToAdd, setUnitsToAdd] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
+  const handleAddUnits = () => {
+    if (selectedBloodType && unitsToAdd && expiryDate) {
+      addBloodUnits(selectedBloodType, parseInt(unitsToAdd), expiryDate);
+      setSelectedBloodType('');
+      setUnitsToAdd('');
+      setExpiryDate('');
+    }
+  };
+
+  const handleUseUnits = (bloodType: string, units: number) => {
+    useBloodUnits(bloodType, units);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -157,7 +155,7 @@ const BloodBank = () => {
             <div className="flex flex-col md:flex-row gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="gradient-primary text-primary-foreground">
+                  <Button className="btn-animated gradient-primary text-primary-foreground">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Blood Units
                   </Button>
@@ -206,18 +204,17 @@ const BloodBank = () => {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Add Units</Button>
+                    <Button type="button" onClick={handleAddUnits}>Add Units</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
 
-              <Button variant="outline" className="transition-medical">
-                <Bell className="w-4 h-4 mr-2" />
-                Request Donation Drive
-              </Button>
-
-              <Button variant="outline" className="transition-medical">
-                <Calendar className="w-4 h-4 mr-2" />
+              <Button 
+                variant="outline" 
+                className="btn-animated"
+                onClick={() => setIsExportOpen(true)}
+              >
+                <Download className="w-4 h-4 mr-2" />
                 Export Report
               </Button>
             </div>
@@ -268,11 +265,31 @@ const BloodBank = () => {
                   </div>
 
                   <div className="flex space-x-2 mt-4">
-                    <Button size="sm" variant="outline" className="flex-1 transition-medical">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 btn-animated"
+                      onClick={() => {
+                        const units = prompt(`Add units for ${stock.bloodType}:`);
+                        if (units && !isNaN(parseInt(units))) {
+                          addBloodUnits(stock.bloodType, parseInt(units), new Date().toISOString().split('T')[0]);
+                        }
+                      }}
+                    >
                       <Plus className="w-3 h-3 mr-1" />
                       Add
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1 transition-medical">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 btn-animated"
+                      onClick={() => {
+                        const units = prompt(`Use units for ${stock.bloodType}:`);
+                        if (units && !isNaN(parseInt(units))) {
+                          handleUseUnits(stock.bloodType, parseInt(units));
+                        }
+                      }}
+                    >
                       <Minus className="w-3 h-3 mr-1" />
                       Use
                     </Button>
@@ -314,6 +331,13 @@ const BloodBank = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Export Modal */}
+        <ExportModal 
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+          dataType="blood"
+        />
       </div>
     </MainLayout>
   );
