@@ -94,7 +94,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataT
             <Label>Export Format</Label>
             <div className="grid grid-cols-2 gap-3">
               <Button
-                variant={exportFormat === 'pdf' ? 'default' : 'outline'}
+                variant={exportFormat === 'pdf' ? 'primary' : 'outline'}
                 onClick={() => setExportFormat('pdf')}
                 className="flex items-center space-x-2"
               >
@@ -102,7 +102,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataT
                 <span>PDF</span>
               </Button>
               <Button
-                variant={exportFormat === 'excel' ? 'default' : 'outline'}
+                variant={exportFormat === 'excel' ? 'primary' : 'outline'}
                 onClick={() => setExportFormat('excel')}
                 className="flex items-center space-x-2"
               >
@@ -158,7 +158,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataT
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleExport} className="gradient-primary text-primary-foreground">
+          <Button variant="success" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
             Export {exportFormat.toUpperCase()}
           </Button>
