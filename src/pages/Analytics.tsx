@@ -159,13 +159,15 @@ const Analytics = () => {
         </div>
 
         {/* Analytics Tabs */}
-        <Tabs defaultValue="bed-demand" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="bed-demand">Bed Demand</TabsTrigger>
-            <TabsTrigger value="blood-demand">Blood Demand</TabsTrigger>
-            <TabsTrigger value="department">Department Analysis</TabsTrigger>
-            <TabsTrigger value="trends">Admission Trends</TabsTrigger>
-          </TabsList>
+        <Card className="medical-card">
+          <CardContent className="p-6">
+            <Tabs defaultValue="bed-demand" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="bed-demand">Bed Demand</TabsTrigger>
+                <TabsTrigger value="blood-demand">Blood Demand</TabsTrigger>
+                <TabsTrigger value="department">Department Analysis</TabsTrigger>
+                <TabsTrigger value="trends">Admission Trends</TabsTrigger>
+              </TabsList>
 
           <TabsContent value="bed-demand" className="space-y-6">
             <Card className="medical-card">
@@ -427,7 +429,9 @@ const Analytics = () => {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

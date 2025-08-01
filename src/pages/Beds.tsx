@@ -86,7 +86,7 @@ const Beds = () => {
 
   return (
     <MainLayout>
-      <div className="animate-fade-in-up">
+      <div className="space-y-6 animate-fade-in-up">
         {/* Hero Section with Background */}
         <div 
           className="relative h-80 rounded-2xl overflow-hidden mb-8 bg-cover bg-center bg-no-repeat shadow-2xl"
@@ -119,7 +119,8 @@ const Beds = () => {
         </div>
 
         {/* Advanced Filters */}
-        <div className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-3xl p-8 shadow-xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm">
+        <Card className="medical-card">
+          <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1 relative group">
               <Search className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
@@ -163,22 +164,26 @@ const Beds = () => {
                 <SelectItem value="reserved">Reserved</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="h-12 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+            <Button className="btn-animated gradient-primary text-primary-foreground">
               <Filter className="w-5 h-5 mr-2" />
               Apply Filters
             </Button>
           </div>
-        </div>
+          </CardContent>
+        </Card>
 
 
         {/* Bed Grid - Custom Design */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-foreground">Available Beds</h2>
-            <div className="text-sm text-muted-foreground">
-              Showing {filteredBeds.length} of {beds.length} beds
-            </div>
-          </div>
+        <Card className="medical-card">
+          <CardHeader className="medical-card-header">
+            <CardTitle className="flex items-center justify-between">
+              <span>Available Beds</span>
+              <div className="text-sm text-muted-foreground font-normal">
+                Showing {filteredBeds.length} of {beds.length} beds
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBeds.map((bed, index) => (
@@ -303,7 +308,8 @@ const Beds = () => {
               </div>
             ))}
           </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Modals */}        
         {selectedBed && (
