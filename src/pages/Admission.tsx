@@ -14,7 +14,7 @@ import { useHospital } from "@/providers/HospitalProvider";
 const Admission = () => {
   const { patients, addPatient } = useHospital();
   const [searchTerm, setSearchTerm] = useState('');
-  const [genderFilter, setGenderFilter] = useState('');
+  const [genderFilter, setGenderFilter] = useState('all');
 
   // Filter patients based on search and filters
   const filteredPatients = useMemo(() => {
@@ -23,7 +23,7 @@ const Admission = () => {
         patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         patient.id.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesGender = genderFilter === '' || patient.gender === genderFilter;
+      const matchesGender = genderFilter === 'all' || patient.gender === genderFilter;
       
       return matchesSearch && matchesGender;
     });
@@ -147,12 +147,12 @@ const Admission = () => {
                 <SelectTrigger className="w-full md:w-48">
                   <SelectValue placeholder="Filter by gender" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Genders</SelectItem>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
+                  <SelectContent>
+                    <SelectItem value="all">All Genders</SelectItem>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
               </Select>
               <Dialog>
                 <DialogTrigger asChild>
