@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp, TrendingDown, Calendar, Download, RefreshCw } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Calendar, Download, RefreshCw, Activity, Users } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import analyticsHero from "@/assets/analytics-hero.jpg";
 
 // Bed Demand Prediction Data
 const bedDemandData = [
@@ -53,114 +54,131 @@ const Analytics = () => {
   return (
     <MainLayout>
       <div className="space-y-6 animate-fade-in-up">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-primary rounded-lg">
-              <BarChart3 className="w-6 h-6 text-primary-foreground" />
+        {/* Hero Section */}
+        <div 
+          className="relative h-80 rounded-2xl overflow-hidden mb-8 bg-cover bg-center bg-no-repeat shadow-2xl"
+          style={{ backgroundImage: `url(${analyticsHero})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
+          <div className="relative z-10 h-full flex items-center justify-between p-8">
+            <div className="text-white">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-5xl font-bold mb-2">Predictive Analytics</h1>
+                  <p className="text-xl text-white/90">Data-driven insights for hospital operations</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-6 mt-6">
+                <div className="flex items-center space-x-2">
+                  <Activity className="w-5 h-5 text-green-400" />
+                  <span className="text-lg font-semibold">Real-time Data</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Users className="w-5 h-5 text-blue-400" />
+                  <span className="text-lg font-semibold">94% Accuracy</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Predictive Analytics</h1>
-              <p className="text-muted-foreground">Data-driven insights for hospital operations</p>
+            <div className="flex items-center space-x-2">
+              <Select defaultValue="7">
+                <SelectTrigger className="w-32 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">7 Days</SelectItem>
+                  <SelectItem value="14">14 Days</SelectItem>
+                  <SelectItem value="30">30 Days</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+              <Button 
+                variant="outline" 
+                className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+                onClick={() => {
+                  const blob = new Blob([JSON.stringify({ type: 'Analytics Report', data: 'sample' })], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'analytics-report.pdf';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Select defaultValue="7">
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">7 Days</SelectItem>
-                <SelectItem value="14">14 Days</SelectItem>
-                <SelectItem value="30">30 Days</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" className="transition-medical">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-            <Button 
-              variant="outline" 
-              className="btn-animated"
-              onClick={() => {
-                // Simulate export functionality
-                const blob = new Blob([JSON.stringify({ type: 'Analytics Report', data: 'sample' })], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'analytics-report.pdf';
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
           </div>
         </div>
 
-        {/* Key Metrics */}
+        {/* Enhanced Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-success-light rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-success" />
+                <div className="p-3 bg-green-500 rounded-xl shadow-lg">
+                  <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">94%</p>
-                  <p className="text-sm text-muted-foreground">Prediction Accuracy</p>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">94%</p>
+                  <p className="text-sm text-green-700 dark:text-green-300 font-medium">Prediction Accuracy</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-primary-light rounded-lg">
-                  <Calendar className="w-6 h-6 text-primary" />
+                <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
+                  <Calendar className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">7</p>
-                  <p className="text-sm text-muted-foreground">Days Forecast</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">7</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Days Forecast</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-warning-light rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-warning" />
+                <div className="p-3 bg-orange-500 rounded-xl shadow-lg">
+                  <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">+12%</p>
-                  <p className="text-sm text-muted-foreground">Expected Increase</p>
+                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">+12%</p>
+                  <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">Expected Increase</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-info-light rounded-lg">
-                  <BarChart3 className="w-6 h-6 text-info" />
+                <div className="p-3 bg-purple-500 rounded-xl shadow-lg">
+                  <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">3.2</p>
-                  <p className="text-sm text-muted-foreground">Avg Stay (Days)</p>
+                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">3.2</p>
+                  <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">Avg Stay (Days)</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Analytics Tabs */}
-        <Card className="medical-card">
-          <CardContent className="p-6">
+        {/* Enhanced Analytics Tabs */}
+        <Card className="medical-card overflow-hidden hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-6 bg-gradient-to-r from-gray-50/50 to-blue-50/50 dark:from-gray-900/20 dark:to-blue-900/20">
             <Tabs defaultValue="bed-demand" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="bed-demand">Bed Demand</TabsTrigger>
