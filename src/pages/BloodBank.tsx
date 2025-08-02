@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ExportModal } from "@/components/ui/export-modal";
 import { Label } from "@/components/ui/label";
-import { Droplets, Plus, Minus, AlertTriangle, Download, TrendingDown, Calendar } from "lucide-react";
+import { Droplets, Plus, Minus, AlertTriangle, Download, TrendingDown, Calendar, Activity, Users } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useHospital } from "@/providers/HospitalProvider";
+import bloodbankHero from "@/assets/bloodbank-hero.jpg";
 
 const BloodBank = () => {
   const { bloodStock, addBloodUnits, useBloodUnits } = useHospital();
@@ -66,96 +67,103 @@ const BloodBank = () => {
   return (
     <MainLayout>
       <div className="space-y-6 animate-fade-in-up">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-primary rounded-lg">
-              <Droplets className="w-6 h-6 text-primary-foreground" />
+        {/* Hero Section */}
+        <div 
+          className="relative h-80 rounded-2xl overflow-hidden mb-8 bg-cover bg-center bg-no-repeat shadow-2xl"
+          style={{ backgroundImage: `url(${bloodbankHero})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
+          <div className="relative z-10 h-full flex items-center justify-between p-8">
+            <div className="text-white">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                  <Droplets className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-5xl font-bold mb-2">Blood Bank Management</h1>
+                  <p className="text-xl text-white/90">Real-time blood inventory and stock management</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-6 mt-6">
+                <div className="flex items-center space-x-2">
+                  <Activity className="w-5 h-5 text-green-400" />
+                  <span className="text-lg font-semibold">{totalUnits} Total Units</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Users className="w-5 h-5 text-red-400" />
+                  <span className="text-lg font-semibold">{criticalStock} Critical</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Blood Bank Management</h1>
-              <p className="text-muted-foreground">Real-time blood inventory and stock management</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="bg-success-light text-success border-success/20">
-              {totalUnits} Total Units
-            </Badge>
-            {criticalStock > 0 && (
-              <Badge variant="outline" className="bg-destructive-light text-destructive border-destructive/20">
-                <AlertTriangle className="w-3 h-3 mr-1" />
-                {criticalStock} Critical
-              </Badge>
-            )}
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Enhanced Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-success-light rounded-lg">
-                  <Droplets className="w-6 h-6 text-success" />
+                <div className="p-3 bg-red-500 rounded-xl shadow-lg">
+                  <Droplets className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{totalUnits}</p>
-                  <p className="text-sm text-muted-foreground">Total Units</p>
+                  <p className="text-3xl font-bold text-red-600 dark:text-red-400">{totalUnits}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300 font-medium">Total Units</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-warning-light rounded-lg">
-                  <TrendingDown className="w-6 h-6 text-warning" />
+                <div className="p-3 bg-orange-500 rounded-xl shadow-lg">
+                  <TrendingDown className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{lowStock}</p>
-                  <p className="text-sm text-muted-foreground">Low Stock</p>
+                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{lowStock}</p>
+                  <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">Low Stock</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-destructive-light rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
+                <div className="p-3 bg-red-500 rounded-xl shadow-lg">
+                  <AlertTriangle className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{criticalStock}</p>
-                  <p className="text-sm text-muted-foreground">Critical/Expired</p>
+                  <p className="text-3xl font-bold text-red-600 dark:text-red-400">{criticalStock}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300 font-medium">Critical/Expired</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
-            <CardContent className="p-6">
+          <Card className="medical-card overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <CardContent className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/30">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-info-light rounded-lg">
-                  <Calendar className="w-6 h-6 text-info" />
+                <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
+                  <Calendar className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">3</p>
-                  <p className="text-sm text-muted-foreground">Expiring Soon</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">3</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Expiring Soon</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Actions */}
-        <Card className="medical-card">
-          <CardContent className="p-6">
+        {/* Enhanced Actions */}
+        <Card className="medical-card overflow-hidden hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-6 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10">
             <div className="flex flex-col md:flex-row gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="btn-animated gradient-primary text-primary-foreground">
+                  <Button className="h-12 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Blood Units
                   </Button>
@@ -211,7 +219,7 @@ const BloodBank = () => {
 
               <Button 
                 variant="outline" 
-                className="btn-animated"
+                className="h-12 px-8 bg-white/80 dark:bg-gray-800/80 border-2 border-gray-200 dark:border-gray-600 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
                 onClick={() => setIsExportOpen(true)}
               >
                 <Download className="w-4 h-4 mr-2" />

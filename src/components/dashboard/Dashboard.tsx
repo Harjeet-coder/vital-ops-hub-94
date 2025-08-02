@@ -1,28 +1,48 @@
 import { StatCard } from "./StatCard";
 import { BloodStockChart } from "./BloodStockChart";
 import { BedOccupancyChart } from "./BedOccupancyChart";
-import { Bed, Users, Activity, Heart, TrendingUp, Calendar } from "lucide-react";
+import { Bed, Users, Activity, Heart, TrendingUp, Calendar, BarChart3, Monitor } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import dashboardHero from "@/assets/dashboard-hero.jpg";
 
 export function Dashboard() {
   return (
     <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Hospital Dashboard</h1>
-          <p className="text-muted-foreground">Real-time overview of hospital operations</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Badge variant="outline" className="bg-success-light text-success border-success/20">
-            <Activity className="w-3 h-3 mr-1" />
-            All Systems Online
-          </Badge>
-          <Badge variant="secondary">
-            <Calendar className="w-3 h-3 mr-1" />
-            {new Date().toLocaleDateString()}
-          </Badge>
+      {/* Hero Section */}
+      <div 
+        className="relative h-80 rounded-2xl overflow-hidden mb-8 bg-cover bg-center bg-no-repeat shadow-2xl"
+        style={{ backgroundImage: `url(${dashboardHero})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
+        <div className="relative z-10 h-full flex items-center justify-between p-8">
+          <div className="text-white">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <BarChart3 className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-5xl font-bold mb-2">Hospital Dashboard</h1>
+                <p className="text-xl text-white/90">Real-time overview of hospital operations</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-6 mt-6">
+              <div className="flex items-center space-x-2">
+                <Activity className="w-5 h-5 text-green-400" />
+                <span className="text-lg font-semibold">All Systems Online</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Monitor className="w-5 h-5 text-blue-400" />
+                <span className="text-lg font-semibold">Real-time Monitoring</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
+              <Calendar className="w-3 h-3 mr-1" />
+              {new Date().toLocaleDateString()}
+            </Badge>
+          </div>
         </div>
       </div>
 
