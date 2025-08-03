@@ -11,6 +11,7 @@ interface BedInfo {
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
   patient?: string;
   department: string;
+  ddBeds: string; // Dedicated Discharge Beds
 }
 
 interface BloodStock {
@@ -70,21 +71,21 @@ export const useHospital = () => {
 };
 
 const initialBeds: BedInfo[] = [
-  { id: '1', ward: 'General Ward A', bedNumber: 'A-15', floor: '3rd', type: 'General', status: 'occupied', patient: 'Jane Smith', department: 'General Medicine' },
-  { id: '2', ward: 'General Ward A', bedNumber: 'A-16', floor: '3rd', type: 'General', status: 'available', department: 'General Medicine' },
-  { id: '3', ward: 'ICU Ward 1', bedNumber: 'I-01', floor: '2nd', type: 'ICU', status: 'occupied', patient: 'John Doe', department: 'ICU' },
-  { id: '4', ward: 'ICU Ward 1', bedNumber: 'I-02', floor: '2nd', type: 'ICU', status: 'available', department: 'ICU' },
-  { id: '5', ward: 'Emergency Ward', bedNumber: 'E-03', floor: '1st', type: 'Emergency', status: 'maintenance', department: 'Emergency' },
-  { id: '6', ward: 'Pediatric Ward', bedNumber: 'P-08', floor: '3rd', type: 'General', status: 'available', department: 'Pediatric' },
-  { id: '7', ward: 'Maternity Ward', bedNumber: 'M-12', floor: '4th', type: 'Private', status: 'occupied', patient: 'Sarah Johnson', department: 'Maternity' },
-  { id: '8', ward: 'Surgical Ward', bedNumber: 'S-05', floor: '2nd', type: 'General', status: 'reserved', department: 'Surgical' },
-  { id: '9', ward: 'Cardiac Unit', bedNumber: 'C-04', floor: '3rd', type: 'ICU', status: 'occupied', patient: 'Robert Lee', department: 'Cardiac' },
-  { id: '10', ward: 'Neurology Ward', bedNumber: 'N-11', floor: '4th', type: 'General', status: 'available', department: 'Neurology' },
-  { id: '11', ward: 'Orthopedic Ward', bedNumber: 'O-07', floor: '3rd', type: 'General', status: 'occupied', patient: 'Maria Garcia', department: 'Orthopedics' },
-  { id: '12', ward: 'Pulmonology Unit', bedNumber: 'PU-03', floor: '4th', type: 'General', status: 'available', department: 'Pulmonology' },
-  { id: '13', ward: 'Oncology Wing', bedNumber: 'ON-09', floor: '5th', type: 'Private', status: 'occupied', patient: 'David Wilson', department: 'Oncology' },
-  { id: '14', ward: 'Burn Unit', bedNumber: 'B-02', floor: '2nd', type: 'ICU', status: 'maintenance', department: 'Burn/Plastic Surgery' },
-  { id: '15', ward: 'Nephrology Ward', bedNumber: 'NE-06', floor: '4th', type: 'General', status: 'available', department: 'Nephrology' },
+  { id: '1', ward: 'General Ward A', bedNumber: 'A-15', floor: '3rd', type: 'General', status: 'occupied', patient: 'Jane Smith', department: 'General Medicine', ddBeds: 'DD-A15' },
+  { id: '2', ward: 'General Ward A', bedNumber: 'A-16', floor: '3rd', type: 'General', status: 'available', department: 'General Medicine', ddBeds: 'DD-A16' },
+  { id: '3', ward: 'ICU Ward 1', bedNumber: 'I-01', floor: '2nd', type: 'ICU', status: 'occupied', patient: 'John Doe', department: 'ICU', ddBeds: 'DD-I01' },
+  { id: '4', ward: 'ICU Ward 1', bedNumber: 'I-02', floor: '2nd', type: 'ICU', status: 'available', department: 'ICU', ddBeds: 'DD-I02' },
+  { id: '5', ward: 'Emergency Ward', bedNumber: 'E-03', floor: '1st', type: 'Emergency', status: 'maintenance', department: 'Emergency', ddBeds: 'DD-E03' },
+  { id: '6', ward: 'Pediatric Ward', bedNumber: 'P-08', floor: '3rd', type: 'General', status: 'available', department: 'Pediatric', ddBeds: 'DD-P08' },
+  { id: '7', ward: 'Maternity Ward', bedNumber: 'M-12', floor: '4th', type: 'Private', status: 'occupied', patient: 'Sarah Johnson', department: 'Maternity', ddBeds: 'DD-M12' },
+  { id: '8', ward: 'Surgical Ward', bedNumber: 'S-05', floor: '2nd', type: 'General', status: 'reserved', department: 'Surgical', ddBeds: 'DD-S05' },
+  { id: '9', ward: 'Cardiac Unit', bedNumber: 'C-04', floor: '3rd', type: 'ICU', status: 'occupied', patient: 'Robert Lee', department: 'Cardiac', ddBeds: 'DD-C04' },
+  { id: '10', ward: 'Neurology Ward', bedNumber: 'N-11', floor: '4th', type: 'General', status: 'available', department: 'Neurology', ddBeds: 'DD-N11' },
+  { id: '11', ward: 'Orthopedic Ward', bedNumber: 'O-07', floor: '3rd', type: 'General', status: 'occupied', patient: 'Maria Garcia', department: 'Orthopedics', ddBeds: 'DD-O07' },
+  { id: '12', ward: 'Pulmonology Unit', bedNumber: 'PU-03', floor: '4th', type: 'General', status: 'available', department: 'Pulmonology', ddBeds: 'DD-PU03' },
+  { id: '13', ward: 'Oncology Wing', bedNumber: 'ON-09', floor: '5th', type: 'Private', status: 'occupied', patient: 'David Wilson', department: 'Oncology', ddBeds: 'DD-ON09' },
+  { id: '14', ward: 'Burn Unit', bedNumber: 'B-02', floor: '2nd', type: 'ICU', status: 'maintenance', department: 'Burn/Plastic Surgery', ddBeds: 'DD-B02' },
+  { id: '15', ward: 'Nephrology Ward', bedNumber: 'NE-06', floor: '4th', type: 'General', status: 'available', department: 'Nephrology', ddBeds: 'DD-NE06' },
 ];
 
 const initialBloodStock: BloodStock[] = [

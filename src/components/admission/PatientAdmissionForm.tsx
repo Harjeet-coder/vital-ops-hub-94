@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 interface PatientForm {
   name: string;
   age: string;
+  dob: string;
   gender: string;
   bloodGroup: string;
   disease: string;
@@ -27,6 +28,7 @@ export function PatientAdmissionForm() {
   const [formData, setFormData] = useState<PatientForm>({
     name: '',
     age: '',
+    dob: '',
     gender: '',
     bloodGroup: '',
     disease: '',
@@ -97,7 +99,7 @@ export function PatientAdmissionForm() {
 
     // Reset form
     setFormData({
-      name: '', age: '', gender: '', bloodGroup: '', disease: '', 
+      name: '', age: '', dob: '', gender: '', bloodGroup: '', disease: '', 
       admissionType: '', department: '', doctor: '', emergencyContact: '', medicalHistory: ''
     });
     setAllocatedBed(null);
@@ -128,7 +130,7 @@ export function PatientAdmissionForm() {
             </CardHeader>
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
                     <Input
@@ -147,6 +149,16 @@ export function PatientAdmissionForm() {
                       value={formData.age}
                       onChange={(e) => handleInputChange('age', e.target.value)}
                       placeholder="Age"
+                      className="transition-medical"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dob">Date of Birth *</Label>
+                    <Input
+                      id="dob"
+                      type="date"
+                      value={formData.dob}
+                      onChange={(e) => handleInputChange('dob', e.target.value)}
                       className="transition-medical"
                     />
                   </div>

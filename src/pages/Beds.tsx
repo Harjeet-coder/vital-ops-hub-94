@@ -256,6 +256,10 @@ const Beds = () => {
                       <span className="text-sm font-medium text-muted-foreground">Department</span>
                       <span className="text-sm font-semibold text-foreground">{bed.department}</span>
                     </div>
+                    <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+                      <span className="text-sm font-medium text-muted-foreground">DD Beds</span>
+                      <span className="text-sm font-semibold text-primary">{bed.ddBeds}</span>
+                    </div>
                     {bed.patient && (
                       <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
                         <span className="text-sm font-medium text-muted-foreground">Patient</span>

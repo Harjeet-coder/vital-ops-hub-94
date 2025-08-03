@@ -229,78 +229,113 @@ const BloodBank = () => {
           </CardContent>
         </Card>
 
-        {/* Blood Stock Grid */}
+        {/* Blood Stock Grid - Enhanced Like Bed Management */}
         <Card className="medical-card">
           <CardHeader className="medical-card-header">
-            <CardTitle>Blood Inventory</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Blood Inventory</span>
+              <div className="text-sm text-muted-foreground font-normal">
+                {bloodStock.length} Blood Types Available
+              </div>
+            </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {bloodStock.map((stock) => (
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bloodStock.map((stock, index) => (
                 <div
                   key={stock.bloodType}
                   className={cn(
-                    "p-4 rounded-lg border transition-medical",
-                    stock.status === 'normal' && "border-success/20 bg-success-light/30",
-                    stock.status === 'low' && "border-warning/20 bg-warning-light/30",
-                    (stock.status === 'critical' || stock.status === 'expired') && "border-destructive/20 bg-destructive-light/30"
+                    "relative overflow-hidden rounded-3xl border-2 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform cursor-pointer backdrop-blur-sm list-item",
+                    stock.status === 'normal' && "border-green-200 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/30 hover:border-green-300",
+                    stock.status === 'low' && "border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/30 hover:border-orange-300",
+                    (stock.status === 'critical' || stock.status === 'expired') && "border-red-200 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30 hover:border-red-300"
                   )}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <Droplets className="w-5 h-5 text-primary" />
-                      <span className="text-xl font-bold text-foreground">{stock.bloodType}</span>
-                    </div>
-                    <Badge className={cn("flex items-center space-x-1", getStatusColor(stock.status))}>
-                      {getStatusIcon(stock.status)}
-                      <span>{stock.status}</span>
-                    </Badge>
-                  </div>
+                  {/* Status Indicator */}
+                  <div className={cn(
+                    "absolute top-0 left-0 w-full h-2",
+                    stock.status === 'normal' && "bg-gradient-to-r from-green-400 to-green-500",
+                    stock.status === 'low' && "bg-gradient-to-r from-orange-400 to-orange-500",
+                    (stock.status === 'critical' || stock.status === 'expired') && "bg-gradient-to-r from-red-400 to-red-500"
+                  )} />
                   
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Units Available:</span>
-                      <span className="font-bold text-2xl text-foreground">{stock.units}</span>
+                  <div className="p-6 pt-8">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className={cn(
+                          "p-2 rounded-full",
+                          stock.status === 'normal' && "bg-green-100 dark:bg-green-900/50",
+                          stock.status === 'low' && "bg-orange-100 dark:bg-orange-900/50",
+                          (stock.status === 'critical' || stock.status === 'expired') && "bg-red-100 dark:bg-red-900/50"
+                        )}>
+                          <Droplets className={cn(
+                            "w-5 h-5",
+                            stock.status === 'normal' && "text-green-600",
+                            stock.status === 'low' && "text-orange-600",
+                            (stock.status === 'critical' || stock.status === 'expired') && "text-red-600"
+                          )} />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground">{stock.bloodType}</h3>
+                          <p className="text-sm text-muted-foreground">Blood Type</p>
+                        </div>
+                      </div>
+                      <div className={cn(
+                        "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide",
+                        stock.status === 'normal' && "bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200",
+                        stock.status === 'low' && "bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200",
+                        (stock.status === 'critical' || stock.status === 'expired') && "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200"
+                      )}>
+                        {stock.status}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Expiry Date:</span>
-                      <span className="font-medium">{stock.expiryDate}</span>
+                    
+                    {/* Details */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+                        <span className="text-sm font-medium text-muted-foreground">Units Available</span>
+                        <span className="text-xl font-bold text-foreground">{stock.units}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+                        <span className="text-sm font-medium text-muted-foreground">Expiry Date</span>
+                        <span className="text-sm font-semibold text-foreground">{stock.expiryDate}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+                        <span className="text-sm font-medium text-muted-foreground">Last Updated</span>
+                        <span className="text-sm font-semibold text-foreground">{stock.lastUpdated}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Last Updated:</span>
-                      <span className="font-medium text-xs">{stock.lastUpdated}</span>
-                    </div>
-                  </div>
 
-                  <div className="flex space-x-2 mt-4">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="flex-1 btn-animated"
-                      onClick={() => {
-                        const units = prompt(`Add units for ${stock.bloodType}:`);
-                        if (units && !isNaN(parseInt(units))) {
-                          addBloodUnits(stock.bloodType, parseInt(units), new Date().toISOString().split('T')[0]);
-                        }
-                      }}
-                    >
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="flex-1 btn-animated"
-                      onClick={() => {
-                        const units = prompt(`Use units for ${stock.bloodType}:`);
-                        if (units && !isNaN(parseInt(units))) {
-                          handleUseUnits(stock.bloodType, parseInt(units));
-                        }
-                      }}
-                    >
-                      <Minus className="w-3 h-3 mr-1" />
-                      Use
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="flex space-x-2">
+                      <Button 
+                        className="flex-1 h-10 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+                        onClick={() => {
+                          const units = prompt(`Add units for ${stock.bloodType}:`);
+                          if (units && !isNaN(parseInt(units))) {
+                            addBloodUnits(stock.bloodType, parseInt(units), new Date().toISOString().split('T')[0]);
+                          }
+                        }}
+                      >
+                        <Plus className="w-3 h-3 mr-1" />
+                        Add
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="flex-1 h-10 border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+                        onClick={() => {
+                          const units = prompt(`Use units for ${stock.bloodType}:`);
+                          if (units && !isNaN(parseInt(units))) {
+                            handleUseUnits(stock.bloodType, parseInt(units));
+                          }
+                        }}
+                      >
+                        <Minus className="w-3 h-3 mr-1" />
+                        Use
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}

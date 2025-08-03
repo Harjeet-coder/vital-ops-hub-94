@@ -165,17 +165,24 @@ const Admission = () => {
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="h-12 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add New Patient
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <PatientAdmissionForm />
-                </DialogContent>
-              </Dialog>
+              <div className="flex space-x-3">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="h-12 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Patient
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <PatientAdmissionForm />
+                  </DialogContent>
+                </Dialog>
+                
+                <Button className="h-12 px-8 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Patient Discharge
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
