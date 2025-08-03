@@ -25,6 +25,7 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
   const [patientData, setPatientData] = useState({
     name: '',
     age: '',
+    dob: '',
     gender: '',
     contactNumber: '',
     emergencyContact: '',
@@ -49,6 +50,7 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
     setPatientData({
       name: '',
       age: '',
+      dob: '',
       gender: '',
       contactNumber: '',
       emergencyContact: '',
@@ -98,18 +100,29 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
-              <Select value={patientData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="dob">Date of Birth</Label>
+              <Input
+                id="dob"
+                type="date"
+                value={patientData.dob}
+                onChange={(e) => handleInputChange('dob', e.target.value)}
+                required
+              />
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="gender">Gender</Label>
+            <Select value={patientData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="space-y-2">

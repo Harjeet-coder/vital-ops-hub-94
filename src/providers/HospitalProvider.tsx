@@ -26,11 +26,13 @@ interface Patient {
   id: string;
   name: string;
   age: number;
+  dob: string;
   gender: string;
   contactNumber: string;
   emergencyContact: string;
   medicalHistory: string;
   assignedBed?: string;
+  bedId?: string;
 }
 
 interface HospitalContextType {
@@ -47,6 +49,7 @@ interface HospitalContextType {
   // Patient Management
   patients: Patient[];
   addPatient: (patient: Omit<Patient, 'id'>) => void;
+  dischargePatient: (patientId: string) => void;
   
   // Filters and Search
   searchTerm: string;
@@ -99,10 +102,16 @@ const initialBloodStock: BloodStock[] = [
   { bloodType: 'O-', units: 12, expiryDate: '2024-02-14', status: 'low', lastUpdated: '2024-01-20 14:15' },
 ];
 
+const initialPatients: Patient[] = [
+  { id: 'P1642445678901', name: 'Jane Smith', age: 34, dob: '1990-03-15', gender: 'female', contactNumber: '+1-555-0123', emergencyContact: '+1-555-9876', medicalHistory: 'Hypertension, Diabetes Type 2', bedId: 'A-15' },
+  { id: 'P1642445678902', name: 'John Doe', age: 28, dob: '1996-07-22', gender: 'male', contactNumber: '+1-555-0124', emergencyContact: '+1-555-9877', medicalHistory: 'No known allergies', bedId: 'I-01' },
+  { id: 'P1642445678903', name: 'Sarah Johnson', age: 29, dob: '1995-11-08', gender: 'female', contactNumber: '+1-555-0125', emergencyContact: '+1-555-9878', medicalHistory: 'Pregnancy - 38 weeks', bedId: 'M-12' },
+];
+
 export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [beds, setBeds] = useState<BedInfo[]>(initialBeds);
   const [bloodStock, setBloodStock] = useState<BloodStock[]>(initialBloodStock);
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [searchTerm, setSearchTerm] = useState('');
   const [wardFilter, setWardFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -171,6 +180,28 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [toast]);
 
+  const dischargePatient = useCallback((patientId: string) => {
+    const patient = patients.find(p => p.id === patientId);
+    if (patient) {
+      // Remove patient from the list
+      setPatients(prev => prev.filter(p => p.id !== patientId));
+      
+      // Free up the bed if patient was assigned to one
+      if (patient.bedId) {
+        setBeds(prev => prev.map(bed => 
+          bed.bedNumber === patient.bedId 
+            ? { ...bed, status: 'available' as const, patient: undefined }
+            : bed
+        ));
+      }
+      
+      toast({
+        title: "Patient Discharged",
+        description: `${patient.name} has been successfully discharged.`,
+      });
+    }
+  }, [patients, toast]);
+
   const exportReport = useCallback((type: 'pdf' | 'excel', data: any) => {
     // Simulate export functionality
     toast({
@@ -198,6 +229,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     useBloodUnits,
     patients,
     addPatient,
+    dischargePatient,
     searchTerm,
     setSearchTerm,
     wardFilter,

@@ -198,17 +198,68 @@ const Analytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={bedDemandData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
+                <ResponsiveContainer width="100%" height={450}>
+                  <LineChart data={bedDemandData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                    <defs>
+                      <linearGradient id="colorPredicted" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorGeneral" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                    <XAxis dataKey="day" stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <YAxis stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '12px', 
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' 
+                      }} 
+                    />
                     <Legend />
-                    <Line type="monotone" dataKey="predicted" stroke="#3b82f6" strokeWidth={3} name="Predicted Total" />
-                    <Line type="monotone" dataKey="general" stroke="#10b981" strokeWidth={2} name="General Ward" />
-                    <Line type="monotone" dataKey="icu" stroke="#ef4444" strokeWidth={2} name="ICU" />
-                    <Line type="monotone" dataKey="emergency" stroke="#f59e0b" strokeWidth={2} name="Emergency" />
+                    <Line 
+                      type="monotone" 
+                      dataKey="predicted" 
+                      stroke="#3b82f6" 
+                      strokeWidth={4} 
+                      name="Predicted Total"
+                      fill="url(#colorPredicted)"
+                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, fill: '#1d4ed8' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="general" 
+                      stroke="#10b981" 
+                      strokeWidth={3} 
+                      name="General Ward"
+                      fill="url(#colorGeneral)"
+                      dot={{ fill: '#10b981', strokeWidth: 2, r: 5 }}
+                      activeDot={{ r: 7, fill: '#059669' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="icu" 
+                      stroke="#ef4444" 
+                      strokeWidth={3} 
+                      name="ICU"
+                      dot={{ fill: '#ef4444', strokeWidth: 2, r: 5 }}
+                      activeDot={{ r: 7, fill: '#dc2626' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="emergency" 
+                      stroke="#f59e0b" 
+                      strokeWidth={3} 
+                      name="Emergency"
+                      dot={{ fill: '#f59e0b', strokeWidth: 2, r: 5 }}
+                      activeDot={{ r: 7, fill: '#d97706' }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -294,21 +345,42 @@ const Analytics = () => {
                 <CardTitle>7-Day Blood Demand Forecast</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={bloodDemandData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
+                <ResponsiveContainer width="100%" height={450}>
+                  <BarChart data={bloodDemandData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                    <defs>
+                      <linearGradient id="colorO+" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0.3}/>
+                      </linearGradient>
+                      <linearGradient id="colorA+" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      </linearGradient>
+                      <linearGradient id="colorB+" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                    <XAxis dataKey="day" stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <YAxis stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '12px', 
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' 
+                      }} 
+                    />
                     <Legend />
-                    <Bar dataKey="O+" fill="#ef4444" name="O+" />
-                    <Bar dataKey="O-" fill="#dc2626" name="O-" />
-                    <Bar dataKey="A+" fill="#3b82f6" name="A+" />
-                    <Bar dataKey="A-" fill="#2563eb" name="A-" />
-                    <Bar dataKey="B+" fill="#10b981" name="B+" />
-                    <Bar dataKey="B-" fill="#059669" name="B-" />
-                    <Bar dataKey="AB+" fill="#8b5cf6" name="AB+" />
-                    <Bar dataKey="AB-" fill="#7c3aed" name="AB-" />
+                    <Bar dataKey="O+" fill="url(#colorO+)" name="O+" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="O-" fill="#dc2626" name="O-" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="A+" fill="url(#colorA+)" name="A+" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="A-" fill="#2563eb" name="A-" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="B+" fill="url(#colorB+)" name="B+" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="B-" fill="#059669" name="B-" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="AB+" fill="#8b5cf6" name="AB+" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="AB-" fill="#7c3aed" name="AB-" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -370,22 +442,51 @@ const Analytics = () => {
                   <CardTitle>Department Utilization</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height={350}>
                     <PieChart>
+                      <defs>
+                        <linearGradient id="colorGeneral" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                        </linearGradient>
+                        <linearGradient id="colorICU" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.3}/>
+                        </linearGradient>
+                        <linearGradient id="colorEmergency" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                        </linearGradient>
+                      </defs>
                       <Pie
                         data={departmentData}
                         cx="50%"
                         cy="50%"
-                        outerRadius={100}
-                        fill="#8884d8"
+                        innerRadius={60}
+                        outerRadius={120}
+                        paddingAngle={5}
                         dataKey="value"
-                        label
+                        label={({ name, value }) => `${name}: ${value}%`}
+                        labelLine={false}
                       >
                         {departmentData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.color}
+                            stroke="#ffffff"
+                            strokeWidth={2}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                          border: '1px solid #e5e7eb', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' 
+                        }} 
+                      />
+                      <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -432,16 +533,51 @@ const Analytics = () => {
                 <CardTitle>6-Month Admission Trends</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={admissionTrends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
+                <ResponsiveContainer width="100%" height={450}>
+                  <BarChart data={admissionTrends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                    <defs>
+                      <linearGradient id="colorAdmissions" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      </linearGradient>
+                      <linearGradient id="colorDischarges" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <YAxis stroke="#6b7280" fontSize={12} fontWeight={500} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '12px', 
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' 
+                      }} 
+                    />
                     <Legend />
-                    <Bar dataKey="admissions" fill="#3b82f6" name="Admissions" />
-                    <Bar dataKey="discharges" fill="#10b981" name="Discharges" />
-                    <Line type="monotone" dataKey="occupancy" stroke="#ef4444" strokeWidth={3} name="Occupancy %" />
+                    <Bar 
+                      dataKey="admissions" 
+                      fill="url(#colorAdmissions)" 
+                      name="Admissions" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey="discharges" 
+                      fill="url(#colorDischarges)" 
+                      name="Discharges" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="occupancy" 
+                      stroke="#ef4444" 
+                      strokeWidth={4} 
+                      name="Occupancy %"
+                      dot={{ fill: '#ef4444', strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, fill: '#dc2626' }}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>

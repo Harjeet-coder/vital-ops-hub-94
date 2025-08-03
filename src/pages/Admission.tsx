@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PatientAdmissionForm } from "@/components/admission/PatientAdmissionForm";
+import { PatientDischargeForm } from "@/components/admission/PatientDischargeForm";
 import { UserPlus, UserCheck, Clock, Calendar, AlertCircle, User, Plus, Activity, Users, Stethoscope } from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -178,10 +179,17 @@ const Admission = () => {
                   </DialogContent>
                 </Dialog>
                 
-                <Button className="h-12 px-8 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Patient Discharge
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="h-12 px-8 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Patient Discharge
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <PatientDischargeForm />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </CardContent>
