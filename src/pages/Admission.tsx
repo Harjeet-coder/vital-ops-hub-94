@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { PatientAdmissionForm } from "@/components/admission/PatientAdmissionForm";
 import { PatientDischargeForm } from "@/components/admission/PatientDischargeForm";
 import { UserPlus, UserCheck, Clock, Calendar, AlertCircle, User, Plus, Activity, Users, Stethoscope } from "lucide-react";
@@ -174,8 +175,10 @@ const Admission = () => {
                       Add New Patient
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <PatientAdmissionForm />
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+                    <ScrollArea className="h-[80vh] pr-4">
+                      <PatientAdmissionForm />
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
                 
@@ -186,8 +189,10 @@ const Admission = () => {
                       Patient Discharge
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <PatientDischargeForm />
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+                    <ScrollArea className="h-[80vh] pr-4">
+                      <PatientDischargeForm />
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </div>

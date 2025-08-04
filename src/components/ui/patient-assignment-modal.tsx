@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { UserPlus } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useHospital } from '@/providers/HospitalProvider';
 
 interface PatientAssignmentModalProps {
@@ -66,7 +67,7 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <UserPlus className="w-5 h-5 text-primary" />
@@ -74,7 +75,8 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <ScrollArea className="h-[60vh] pr-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Patient Name</Label>
             <Input
@@ -167,6 +169,7 @@ export const PatientAssignmentModal: React.FC<PatientAssignmentModalProps> = ({
             </Button>
           </DialogFooter>
         </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

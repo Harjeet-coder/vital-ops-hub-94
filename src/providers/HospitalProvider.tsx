@@ -40,6 +40,7 @@ interface HospitalContextType {
   beds: BedInfo[];
   assignPatientToBed: (bedId: string, patientId: string) => void;
   updateBedStatus: (bedId: string, status: BedInfo['status']) => void;
+  addBed: (bed: Omit<BedInfo, 'id'>) => void;
   
   // Blood Bank Management
   bloodStock: BloodStock[];
@@ -139,6 +140,15 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [toast]);
 
+  const addBed = useCallback((bed: Omit<BedInfo, 'id'>) => {
+    const newBed = { ...bed, id: Date.now().toString() };
+    setBeds(prev => [...prev, newBed]);
+    toast({
+      title: "Bed Added Successfully",
+      description: `Bed ${bed.bedNumber} has been added to ${bed.ward}.`,
+    });
+  }, [toast]);
+
   const addBloodUnits = useCallback((bloodType: string, units: number, expiryDate: string) => {
     setBloodStock(prev => prev.map(stock => 
       stock.bloodType === bloodType 
@@ -224,6 +234,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     beds,
     assignPatientToBed,
     updateBedStatus,
+    addBed,
     bloodStock,
     addBloodUnits,
     useBloodUnits,

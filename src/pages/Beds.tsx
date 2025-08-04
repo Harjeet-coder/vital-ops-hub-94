@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FloorPlanModal } from "@/components/ui/floor-plan-modal";
 import { PatientAssignmentModal } from "@/components/ui/patient-assignment-modal";
+import { AddBedForm } from "@/components/admission/AddBedForm";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bed, Search, Filter, Eye, UserPlus, Settings, Activity, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHospital } from "@/providers/HospitalProvider";
@@ -168,6 +171,19 @@ const Beds = () => {
               <Filter className="w-5 h-5 mr-2" />
               Apply Filters
             </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="btn-animated bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+                  <Bed className="w-5 h-5 mr-2" />
+                  Add Bed
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+                <ScrollArea className="h-[80vh] pr-4">
+                  <AddBedForm />
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
           </div>
           </CardContent>
         </Card>
