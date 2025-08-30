@@ -21,8 +21,10 @@ interface BedForm {
   monitoringEquipment: boolean;
   status: 'available' | 'occupied' | 'maintenance';
 }
-
-export function AddBedForm() {
+interface AddBedFormProps {
+  onBedAdded?: () => void; // optional callback from parent
+}
+export function AddBedForm({ onBedAdded }: AddBedFormProps) {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<BedForm>({
@@ -91,7 +93,8 @@ export function AddBedForm() {
         title: "Bed Added Successfully",
         description: `Bed ${res.data.bed.bedNumber} added in ${res.data.bed.ward}`,
       });
-
+      onBedAdded?.();
+      
       setFormData({
         ward: '',
         bedNumber: '',

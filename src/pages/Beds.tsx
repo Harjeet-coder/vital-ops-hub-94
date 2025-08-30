@@ -3,60 +3,160 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FloorPlanModal } from "@/components/ui/floor-plan-modal";
 import { PatientAssignmentModal } from "@/components/ui/patient-assignment-modal";
 import { AddBedForm } from "@/components/admission/AddBedForm";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bed, Search, Filter, Eye, UserPlus, Settings, Activity, Users } from "lucide-react";
+import { Bed, Search, Filter, Eye, UserPlus, Settings, Activity, Users, Wrench } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useHospital } from "@/providers/HospitalProvider";
-import { useState, useMemo } from "react";
+//import { useHospital } from "@/providers/HospitalProvider";
+import { useEffect, useState, useMemo } from "react";
 import hospitalHero from "@/assets/hospital-hero.jpg";
 
+interface BedType {
+  _id: string;
+  ward: string;
+  bedNumber: string;
+  status: "available" | "occupied" | "maintenance" | "reserved";
+  floor?: string;
+  department?: string;
+  ddBeds?: number;
+  assignedTo?: PatientType; // ✅ instead of patient:string
+}
+
+interface PatientType {
+  _id: string;
+  name: string;
+  age: number;
+  gender: string;
+  admissionNumber: string;
+  admissionDate: string;
+  reasonForAdmitting?: string;
+  doctor?: string;
+}
 const Beds = () => {
-  const { 
-    beds, 
-    searchTerm, 
-    setSearchTerm, 
-    wardFilter, 
-    setWardFilter, 
-    statusFilter, 
-    setStatusFilter,
-    updateBedStatus
-  } = useHospital();
-  
+  // ✅ Local State (replaces useHospital())
+  const [beds, setBeds] = useState<BedType[]>([]);
+  const [summary, setSummary] = useState<{ totalBeds: number; availableBeds: number; occupiedBeds: number; maintenanceBeds: number }>({
+    totalBeds: 0,
+    availableBeds: 0,
+    occupiedBeds: 0,
+    maintenanceBeds: 0
+  });
+const [loading, setLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [wardFilter, setWardFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const [isAssignmentOpen, setIsAssignmentOpen] = useState(false);
   const [selectedBed, setSelectedBed] = useState<{ id: string; bedNumber: string } | null>(null);
+  const [patientDetails, setPatientDetails]=useState<PatientType |null>(null);
+  const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
+const navigate = useNavigate();
+  // ✅ Fetch beds from backend
+const fetchBeds = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/beds");
+      setBeds(res.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching beds:", error);
+      setLoading(false);
+    }
+  };
 
-  // Filter beds based on search and filters
-  const filteredBeds = useMemo(() => {
-    return beds.filter(bed => {
-      const matchesSearch = searchTerm === '' || 
-        bed.bedNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bed.patient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bed.ward.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesWard = wardFilter === 'all' || 
-        bed.ward.toLowerCase().includes(wardFilter.toLowerCase()) ||
-        bed.department.toLowerCase().includes(wardFilter.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || bed.status === statusFilter;
-      
-      return matchesSearch && matchesWard && matchesStatus;
-    });
-  }, [beds, searchTerm, wardFilter, statusFilter]);
+  // ✅ Fetch summary from backend
+  const fetchSummary = async () => {
+    try {
+      const res = await axios.get("/api/beds/summary");
+      setSummary(res.data);
+    } catch (error) {
+      console.error("Error fetching summary:", error);
+    }
+  };
 
+  // ✅ Update bed status (maintenance, etc.)
+  const updateBedStatus = async (bedId: string, newStatus: string) => {
+    try {
+      await axios.put(`/api/beds/${bedId}`, { status: newStatus });
+      fetchBeds(); // refresh after update
+      fetchSummary();
+    } catch (error) {
+      console.error("Error updating bed:", error);
+    }
+  };
 
+  const handleViewPatient = async (bedId: string) => {
+    try {
+      const res = await axios.get(`/api/beds/${bedId}`);
+      if (res.data.assignedTo) {
+        setPatientDetails(res.data.assignedTo);
+        setIsPatientModalOpen(true);
+      } else {
+        alert("No patient assigned to this bed.");
+      }
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+    }
+  };
+
+   // ✅ Assign patient
   const handleAssignPatient = (bedId: string, bedNumber: string) => {
     setSelectedBed({ id: bedId, bedNumber });
     setIsAssignmentOpen(true);
   };
 
   const handleMaintenanceSchedule = (bedId: string) => {
-    updateBedStatus(bedId, 'maintenance');
+    updateBedStatus(bedId, "maintenance");
   };
+
+  useEffect(() => {
+    fetchBeds();
+    fetchSummary();
+  }, []);
+  // Filter beds based on search and filters
+const filteredBeds = useMemo(() => {
+  return beds.filter(bed => {
+    const bedNumber = bed?.bedNumber || "";
+    const patient = bed?.assignedTo?.name || "";
+    const ward = bed?.ward || "";
+    const department = bed?.department || "";
+    const status = bed?.status || "";
+
+    const matchesSearch =
+      searchTerm === "" ||
+      bedNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ward.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesWard =
+      wardFilter === "all" ||
+      ward.toLowerCase().includes(wardFilter.toLowerCase()) ||
+      department.toLowerCase().includes(wardFilter.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || status === statusFilter;
+
+    return matchesSearch && matchesWard && matchesStatus;
+  });
+}, [beds, searchTerm, wardFilter, statusFilter]);
+ 
+
+
+  // const handleAssignPatient = (bedId: string, bedNumber: string) => {
+  //   setSelectedBed({ id: bedId, bedNumber });
+  //   setIsAssignmentOpen(true);
+  // };
+
+  // const handleMaintenanceSchedule = (bedId: string) => {
+  //   updateBedStatus(bedId, 'maintenance');
+  // };
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
@@ -110,11 +210,15 @@ const Beds = () => {
               <div className="flex items-center space-x-6 mt-6">
                 <div className="flex items-center space-x-2">
                   <Activity className="w-5 h-5 text-green-400" />
-                  <span className="text-lg font-semibold">{filteredBeds.filter(b => b.status === 'available').length} Available</span>
+                  <span className="text-lg font-semibold">{summary.availableBeds} Available</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Users className="w-5 h-5 text-red-400" />
-                  <span className="text-lg font-semibold">{filteredBeds.filter(b => b.status === 'occupied').length} Occupied</span>
+                  <span className="text-lg font-semibold">{summary.occupiedBeds} Occupied</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Wrench className="w-5 h-5 text-yellow-400" />
+                  <span className="text-lg font-semibold">{summary.maintenanceBeds} Maintenance</span>
                 </div>
               </div>
             </div>
@@ -164,7 +268,6 @@ const Beds = () => {
                 <SelectItem value="available">Available</SelectItem>
                 <SelectItem value="occupied">Occupied</SelectItem>
                 <SelectItem value="maintenance">Maintenance</SelectItem>
-                <SelectItem value="reserved">Reserved</SelectItem>
               </SelectContent>
             </Select>
             <Button className="btn-animated gradient-primary text-primary-foreground">
@@ -180,7 +283,7 @@ const Beds = () => {
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
                 <ScrollArea className="h-[80vh] pr-4">
-                  <AddBedForm />
+                  <AddBedForm onBedAdded={() => { fetchBeds(); fetchSummary(); }}/>
                 </ScrollArea>
               </DialogContent>
             </Dialog>
@@ -200,11 +303,11 @@ const Beds = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBeds.map((bed, index) => (
+              
               <div
-                key={bed.id}
+                key={bed._id}
                 className={cn(
                   "relative overflow-hidden rounded-3xl border-2 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform cursor-pointer backdrop-blur-sm list-item",
                   bed.status === 'available' && "border-green-200 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/30 hover:border-green-300",
@@ -214,6 +317,7 @@ const Beds = () => {
                 )}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
+              
                 {/* Status Indicator */}
                 <div className={cn(
                   "absolute top-0 left-0 w-full h-2",
@@ -242,10 +346,6 @@ const Beds = () => {
                           bed.status === 'reserved' && "text-blue-600"
                         )} />
                       </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-foreground">{bed.bedNumber}</h3>
-                        <p className="text-sm text-muted-foreground">{bed.type}</p>
-                      </div>
                     </div>
                     <div className={cn(
                       "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide",
@@ -260,6 +360,10 @@ const Beds = () => {
                   
                   {/* Details */}
                   <div className="space-y-3 mb-6">
+                     <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+              <span className="text-sm font-medium text-muted-foreground">Bed Number</span>
+              <span className="text-sm font-semibold text-foreground">{bed.bedNumber}</span>
+            </div>
                     <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
                       <span className="text-sm font-medium text-muted-foreground">Ward</span>
                       <span className="text-sm font-semibold text-foreground">{bed.ward}</span>
@@ -276,10 +380,10 @@ const Beds = () => {
                       <span className="text-sm font-medium text-muted-foreground">DD Beds</span>
                       <span className="text-sm font-semibold text-primary">{bed.ddBeds}</span>
                     </div>
-                    {bed.patient && (
+                    {bed.assignedTo && (
                       <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
                         <span className="text-sm font-medium text-muted-foreground">Patient</span>
-                        <span className="text-sm font-semibold text-primary">{bed.patient}</span>
+                        <span className="text-sm font-semibold text-primary">{bed.assignedTo.name}</span>
                       </div>
                     )}
                   </div>
@@ -287,28 +391,28 @@ const Beds = () => {
                   {/* Action Buttons */}
                   {bed.status === 'available' && (
                     <Button 
-                      className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
-                      onClick={() => handleAssignPatient(bed.id, bed.bedNumber)}
+                        className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+                      onClick={() => navigate(`/admission?bedId=${bed._id}`)}
                     >
                       <UserPlus className="w-4 h-4 mr-2" />
                       Assign Patient
                     </Button>
                   )}
 
-                  {bed.status === 'occupied' && bed.patient && (
+                  {bed.status === 'occupied' && bed.assignedTo && (
                     <Button 
-                      variant="outline" 
-                      className="w-full h-12 border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+                        className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
+                      onClick={() => navigate(`/patients/${bed.assignedTo._id}`)}
                     >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View {bed.patient}
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      View Patient
                     </Button>
                   )}
 
                   {bed.status === 'maintenance' && (
                     <Button 
                       className="w-full h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold"
-                      onClick={() => handleMaintenanceSchedule(bed.id)}
+                      onClick={() => handleMaintenanceSchedule(bed._id)}
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Schedule Repair
@@ -338,10 +442,30 @@ const Beds = () => {
             onClose={() => {
               setIsAssignmentOpen(false);
               setSelectedBed(null);
+              fetchBeds();
+              fetchSummary();
             }}
             bedId={selectedBed.id}
             bedNumber={selectedBed.bedNumber}
           />
+        )}
+        {/* Patient Details Modal */}
+        {isPatientModalOpen && patientDetails && (
+          <Dialog open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen}>
+            <DialogContent className="max-w-md">
+              <h2 className="text-xl font-bold mb-4">Patient Details</h2>
+              <div className="space-y-2">
+                <p><strong>Name:</strong> {patientDetails.name}</p>
+                <p><strong>Age:</strong> {patientDetails.age}</p>
+                <p><strong>Gender:</strong> {patientDetails.gender}</p>
+                <p><strong>Admission No:</strong> {patientDetails.admissionNumber}</p>
+                <p><strong>Admission Date:</strong> {new Date(patientDetails.admissionDate).toLocaleDateString()}</p>
+                <p><strong>Reason:</strong> {patientDetails.reasonForAdmitting}</p>
+                <p><strong>Doctor:</strong> {patientDetails.doctor}</p>
+              </div>
+              <Button className="mt-4 w-full" onClick={() => setIsPatientModalOpen(false)}>Close</Button>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </MainLayout>

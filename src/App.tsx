@@ -10,7 +10,7 @@ import Beds from "./pages/Beds";
 import BloodBank from "./pages/BloodBank";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
-
+import PatientDetails from "./pages/PatientDetails";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/beds" element={<Beds />} />
           <Route path="/blood-bank" element={<BloodBank />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/patients/:id" element={<PatientDetails />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

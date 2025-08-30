@@ -38,6 +38,9 @@ const Admission = () => {
   const [patients, setPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [genderFilter, setGenderFilter] = useState("all");
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patientDetails, setPatientDetails] = useState(null);
+  const [openDetails, setOpenDetails] = useState(false);
 
   const fetchPatients = async () => {
     try {
@@ -45,6 +48,17 @@ const Admission = () => {
       setPatients(res.data);
     } catch (err) {
       console.error("Failed to fetch patients", err);
+    }
+  };
+
+  const fetchPatientDetails = async (id) => {
+    try {
+      setPatientDetails(null); // reset before fetching
+      const res = await axios.get(`/api/patients/${id}`);
+      setPatientDetails(res.data);
+      setOpenDetails(true);
+    } catch (err) {
+      console.error("Failed to fetch patient details", err);
     }
   };
 
@@ -61,9 +75,9 @@ const filteredPatients = useMemo(() => {
       patient.admissionNumber?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesGender =
-      genderFilter === "all" || patient.gender === genderFilter;
+      genderFilter === "all" || patient.gender?.toLowerCase() === genderFilter;
 
-    const notDischarged = patient.status !== 'discharged';
+    const notDischarged = patient.status?.toLowerCase() !== 'discharged';
 
     return matchesSearch && matchesGender && notDischarged;
   });
@@ -262,7 +276,8 @@ const filteredPatients = useMemo(() => {
               {filteredPatients.map((patient) => (
                 <div
                   key={patient._id}
-                  className="p-6 border rounded-xl shadow-sm hover:shadow-md transition"
+                  onClick={()=>fetchPatientDetails(patient._id)}
+                  className="p-6 border rounded-xl shadow-sm hover:shadow-md transition cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -298,6 +313,35 @@ const filteredPatients = useMemo(() => {
             </div>
           </CardContent>
         </Card>
+        {/* Patient Details Dialog */}
+        <Dialog open={openDetails} onOpenChange={setOpenDetails}>
+          <DialogContent className="max-w-lg">
+            {patientDetails ? (
+              <div className="space-y-3">
+                <h2 className="text-2xl font-bold">{patientDetails.name}</h2>
+                <p><strong>Admission Number:</strong> {patientDetails.admissionNumber}</p>
+                <p><strong>Age:</strong> {patientDetails.age}</p>
+                <p><strong>DOB:</strong>{patientDetails.dob}</p>
+                <p><strong>Gender:</strong> {patientDetails.gender}</p>
+                <p><strong>Status:</strong> {patientDetails.status}</p>
+                <p><strong>Contact No</strong>{patientDetails.emergencyContact}</p>
+                <p><strong>Doctor Name</strong>{patientDetails.doctor}</p>
+                <p><strong>Admission Date:</strong> {new Date(patientDetails.admissionDate).toLocaleDateString()}</p>
+                {patientDetails.dischargedAt && (
+                  <p><strong>Discharged At:</strong> {new Date(patientDetails.dischargedAt).toLocaleDateString()}</p>
+                )}
+                {patientDetails.bed && (
+                  <p><strong>Bed Assigned:</strong> {patientDetails.bed.bedNumber} ({patientDetails.bed.ward})</p>
+                )}
+                {patientDetails.medicalHistory && (
+                  <p><strong>Medical History:</strong> {patientDetails.medicalHistory}</p>
+                )}
+              </div>
+            ) : (
+              <p>Loading patient details...</p>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );

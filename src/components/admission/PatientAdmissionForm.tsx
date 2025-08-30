@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Bed, User, Stethoscope, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
+import { useSearchParams } from "react-router-dom";
 // Props interface added
 interface PatientAdmissionFormProps {
   onSuccess?: () => void;
@@ -32,7 +32,8 @@ interface PatientForm {
 
 export function PatientAdmissionForm({ onSuccess }: PatientAdmissionFormProps) {
   const { toast } = useToast();
-
+  const [searchParams] = useSearchParams();
+  const preSelectedBedId = searchParams.get("bedId");
   const [formData, setFormData] = useState<PatientForm>({
     name: '',
     age: '',
@@ -84,7 +85,8 @@ export function PatientAdmissionForm({ onSuccess }: PatientAdmissionFormProps) {
         ward: formData.department,
         primarymedicalcondititon: formData.disease,
         reasonForAdmitting: formData.disease,
-        admissionDate: new Date().toISOString()
+        admissionDate: new Date().toISOString(),
+        bedId: preSelectedBedId || null
       });
 
       const { admissionNumber, bedAssigned } = response.data;
