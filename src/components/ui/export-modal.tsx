@@ -13,69 +13,42 @@ interface ExportModalProps {
   dataType: 'beds' | 'blood' | 'analytics';
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataType }) => {
-  const { exportReport, beds, bloodStock } = useHospital();
-  const [exportFormat, setExportFormat] = useState<'pdf' | 'excel'>('pdf');
+export const ExportModal: React.FC<ExportModalProps> = ({
+  isOpen,
+  onClose,
+  dataType,
+}) => {
+  const { exportReport } = useHospital();
+  const [exportFormat, setExportFormat] = useState<"pdf" | "excel">("pdf");
   const [includeCharts, setIncludeCharts] = useState(true);
   const [includeStats, setIncludeStats] = useState(true);
-  const [dateRange, setDateRange] = useState('last_30_days');
+  const [dateRange, setDateRange] = useState("last_30_days");
+  const [loading, setLoading] = useState(false);
 
-  const handleExport = () => {
-    let exportData;
-    
-    switch (dataType) {
-      case 'beds':
-        exportData = {
-          type: 'Bed Management Report',
-          timestamp: new Date().toISOString(),
-          data: beds,
-          summary: {
-            total: beds.length,
-            available: beds.filter(b => b.status === 'available').length,
-            occupied: beds.filter(b => b.status === 'occupied').length,
-            maintenance: beds.filter(b => b.status === 'maintenance').length,
-          }
-        };
-        break;
-      case 'blood':
-        exportData = {
-          type: 'Blood Bank Report',
-          timestamp: new Date().toISOString(),
-          data: bloodStock,
-          summary: {
-            totalUnits: bloodStock.reduce((sum, stock) => sum + stock.units, 0),
-            criticalStock: bloodStock.filter(stock => stock.status === 'critical').length,
-            lowStock: bloodStock.filter(stock => stock.status === 'low').length,
-          }
-        };
-        break;
-      case 'analytics':
-        exportData = {
-          type: 'Analytics Report',
-          timestamp: new Date().toISOString(),
-          dateRange: dateRange,
-          includeCharts: includeCharts,
-          includeStats: includeStats,
-          data: {
-            beds: beds,
-            bloodStock: bloodStock,
-          }
-        };
-        break;
-      default:
-        exportData = { type: 'Unknown Report' };
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+      await exportReport(exportFormat, dataType, {
+        includeCharts,
+        includeStats,
+        dateRange,
+      });
+      onClose();
+    } finally {
+      setLoading(false);
     }
-
-    exportReport(exportFormat, exportData);
-    onClose();
   };
 
   const getTitle = () => {
     switch (dataType) {
-      case 'beds': return 'Export Bed Management Report';
-      case 'blood': return 'Export Blood Bank Report';
-      case 'analytics': return 'Export Analytics Report';
-      default: return 'Export Report';
+      case "beds":
+        return "Export Bed Management Report";
+      case "blood":
+        return "Export Blood Bank Report";
+      case "analytics":
+        return "Export Analytics Report";
+      default:
+        return "Export Report";
     }
   };
 
@@ -116,7 +89,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataT
             <>
               <div className="space-y-2">
                 <Label htmlFor="dateRange">Date Range</Label>
-                <Select value={dateRange} onValueChange={setDateRange}>
+                <Select value={dateRange} onValueChange={(val) => setDateRange(val)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -158,9 +131,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, dataT
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="success" onClick={handleExport}>
+          <Button variant="success" onClick={handleExport} disabled={loading}>
             <Download className="w-4 h-4 mr-2" />
-            Export {exportFormat.toUpperCase()}
+            {loading
+              ? "Exporting..."
+              : `Export ${exportFormat.toUpperCase()}`}
           </Button>
         </DialogFooter>
       </DialogContent>

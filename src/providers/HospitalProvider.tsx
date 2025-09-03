@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 // Types
@@ -36,33 +36,19 @@ interface Patient {
 }
 
 interface HospitalContextType {
-  // Bed Management
   beds: BedInfo[];
-  assignPatientToBed: (bedId: string, patientId: string) => void;
-  updateBedStatus: (bedId: string, status: BedInfo['status']) => void;
-  addBed: (bed: Omit<BedInfo, 'id'>) => void;
-  
-  // Blood Bank Management
-  bloodStock: BloodStock[];
-  addBloodUnits: (bloodType: string, units: number, expiryDate: string) => void;
-  useBloodUnits: (bloodType: string, units: number) => void;
-  
-  // Patient Management
   patients: Patient[];
-  addPatient: (patient: Omit<Patient, 'id'>) => void;
-  dischargePatient: (patientId: string) => void;
-  
-  // Filters and Search
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  wardFilter: string;
-  setWardFilter: (ward: string) => void;
-  statusFilter: string;
-  setStatusFilter: (status: string) => void;
-  
-  // Export functionality
-  exportReport: (type: 'pdf' | 'excel', data: any) => void;
+  bloodStock: BloodStock[];
+  setBeds: React.Dispatch<React.SetStateAction<BedInfo[]>>;
+  setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
+  setBloodStock: React.Dispatch<React.SetStateAction<BloodStock[]>>;
+  exportReport: (
+    format: "pdf" | "excel",
+    reportType: "beds" | "blood" | "analytics",
+    options?: { dateRange?: string; includeCharts?: boolean; includeStats?: boolean }
+  ) => Promise<void>;
 }
+
 
 const HospitalContext = createContext<HospitalContextType | undefined>(undefined);
 
@@ -74,45 +60,11 @@ export const useHospital = () => {
   return context;
 };
 
-const initialBeds: BedInfo[] = [
-  { id: '1', ward: 'General Ward A', bedNumber: 'A-15', floor: '3rd', type: 'General', status: 'occupied', patient: 'Jane Smith', department: 'General Medicine', ddBeds: 'DD-A15' },
-  { id: '2', ward: 'General Ward A', bedNumber: 'A-16', floor: '3rd', type: 'General', status: 'available', department: 'General Medicine', ddBeds: 'DD-A16' },
-  { id: '3', ward: 'ICU Ward 1', bedNumber: 'I-01', floor: '2nd', type: 'ICU', status: 'occupied', patient: 'John Doe', department: 'ICU', ddBeds: 'DD-I01' },
-  { id: '4', ward: 'ICU Ward 1', bedNumber: 'I-02', floor: '2nd', type: 'ICU', status: 'available', department: 'ICU', ddBeds: 'DD-I02' },
-  { id: '5', ward: 'Emergency Ward', bedNumber: 'E-03', floor: '1st', type: 'Emergency', status: 'maintenance', department: 'Emergency', ddBeds: 'DD-E03' },
-  { id: '6', ward: 'Pediatric Ward', bedNumber: 'P-08', floor: '3rd', type: 'General', status: 'available', department: 'Pediatric', ddBeds: 'DD-P08' },
-  { id: '7', ward: 'Maternity Ward', bedNumber: 'M-12', floor: '4th', type: 'Private', status: 'occupied', patient: 'Sarah Johnson', department: 'Maternity', ddBeds: 'DD-M12' },
-  { id: '8', ward: 'Surgical Ward', bedNumber: 'S-05', floor: '2nd', type: 'General', status: 'reserved', department: 'Surgical', ddBeds: 'DD-S05' },
-  { id: '9', ward: 'Cardiac Unit', bedNumber: 'C-04', floor: '3rd', type: 'ICU', status: 'occupied', patient: 'Robert Lee', department: 'Cardiac', ddBeds: 'DD-C04' },
-  { id: '10', ward: 'Neurology Ward', bedNumber: 'N-11', floor: '4th', type: 'General', status: 'available', department: 'Neurology', ddBeds: 'DD-N11' },
-  { id: '11', ward: 'Orthopedic Ward', bedNumber: 'O-07', floor: '3rd', type: 'General', status: 'occupied', patient: 'Maria Garcia', department: 'Orthopedics', ddBeds: 'DD-O07' },
-  { id: '12', ward: 'Pulmonology Unit', bedNumber: 'PU-03', floor: '4th', type: 'General', status: 'available', department: 'Pulmonology', ddBeds: 'DD-PU03' },
-  { id: '13', ward: 'Oncology Wing', bedNumber: 'ON-09', floor: '5th', type: 'Private', status: 'occupied', patient: 'David Wilson', department: 'Oncology', ddBeds: 'DD-ON09' },
-  { id: '14', ward: 'Burn Unit', bedNumber: 'B-02', floor: '2nd', type: 'ICU', status: 'maintenance', department: 'Burn/Plastic Surgery', ddBeds: 'DD-B02' },
-  { id: '15', ward: 'Nephrology Ward', bedNumber: 'NE-06', floor: '4th', type: 'General', status: 'available', department: 'Nephrology', ddBeds: 'DD-NE06' },
-];
-
-const initialBloodStock: BloodStock[] = [
-  { bloodType: 'A+', units: 25, expiryDate: '2024-02-15', status: 'normal', lastUpdated: '2024-01-20 10:30' },
-  { bloodType: 'A-', units: 8, expiryDate: '2024-02-10', status: 'low', lastUpdated: '2024-01-20 09:15' },
-  { bloodType: 'B+', units: 32, expiryDate: '2024-02-20', status: 'normal', lastUpdated: '2024-01-20 11:45' },
-  { bloodType: 'B-', units: 5, expiryDate: '2024-02-08', status: 'critical', lastUpdated: '2024-01-20 08:20' },
-  { bloodType: 'AB+', units: 15, expiryDate: '2024-02-18', status: 'normal', lastUpdated: '2024-01-20 12:10' },
-  { bloodType: 'AB-', units: 3, expiryDate: '2024-02-12', status: 'critical', lastUpdated: '2024-01-20 07:55' },
-  { bloodType: 'O+', units: 45, expiryDate: '2024-02-25', status: 'normal', lastUpdated: '2024-01-20 13:30' },
-  { bloodType: 'O-', units: 12, expiryDate: '2024-02-14', status: 'low', lastUpdated: '2024-01-20 14:15' },
-];
-
-const initialPatients: Patient[] = [
-  { id: 'P1642445678901', name: 'Jane Smith', age: 34, dob: '1990-03-15', gender: 'female', contactNumber: '+1-555-0123', emergencyContact: '+1-555-9876', medicalHistory: 'Hypertension, Diabetes Type 2', bedId: 'A-15' },
-  { id: 'P1642445678902', name: 'John Doe', age: 28, dob: '1996-07-22', gender: 'male', contactNumber: '+1-555-0124', emergencyContact: '+1-555-9877', medicalHistory: 'No known allergies', bedId: 'I-01' },
-  { id: 'P1642445678903', name: 'Sarah Johnson', age: 29, dob: '1995-11-08', gender: 'female', contactNumber: '+1-555-0125', emergencyContact: '+1-555-9878', medicalHistory: 'Pregnancy - 38 weeks', bedId: 'M-12' },
-];
 
 export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [beds, setBeds] = useState<BedInfo[]>(initialBeds);
-  const [bloodStock, setBloodStock] = useState<BloodStock[]>(initialBloodStock);
-  const [patients, setPatients] = useState<Patient[]>(initialPatients);
+  const [beds, setBeds] = useState<BedInfo[]>([]);
+  const [bloodStock, setBloodStock] = useState<BloodStock[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [wardFilter, setWardFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -212,47 +164,76 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [patients, toast]);
 
-  const exportReport = useCallback((type: 'pdf' | 'excel', data: any) => {
-    // Simulate export functionality
-    toast({
-      title: `${type.toUpperCase()} Export Started`,
-      description: "Your report is being generated and will download shortly.",
-    });
-    
-    // Create a blob URL for download simulation
-    const jsonData = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `hospital-report-${Date.now()}.${type === 'pdf' ? 'json' : 'json'}`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [toast]);
+const exportReport = useCallback(
+  async (
+    format: "pdf" | "excel",
+    reportType: "beds" | "blood" | "analytics",
+    options?: { dateRange?: string; includeCharts?: boolean; includeStats?: boolean }
+  ) => {
+    try {
+      toast({
+        title: `${format.toUpperCase()} Export Started`,
+        description: "Your report is being generated...",
+      });
 
-  const value: HospitalContextType = {
-    beds,
-    assignPatientToBed,
-    updateBedStatus,
-    addBed,
-    bloodStock,
-    addBloodUnits,
-    useBloodUnits,
-    patients,
-    addPatient,
-    dischargePatient,
-    searchTerm,
-    setSearchTerm,
-    wardFilter,
-    setWardFilter,
-    statusFilter,
-    setStatusFilter,
-    exportReport,
-  };
+      let url = "";
+
+      if (reportType === "blood") {
+        url = `/api/bloodbankexport/export/${format}`;
+      } else if (reportType === "beds") {
+        url = `/api/bedsexport/export/${format}`;
+      } else if (reportType === "analytics") {
+        const params = new URLSearchParams();
+        if (options?.dateRange) params.append("dateRange", options.dateRange);
+        if (options?.includeCharts) params.append("includeCharts", "true");
+        if (options?.includeStats) params.append("includeStats", "true");
+        url = `/api/analyticsexport/export/${format}?${params.toString()}`;
+      }
+
+      const res = await fetch(url, { method: "GET" });
+      if (!res.ok) throw new Error("Export failed");
+
+      const blob = await res.blob();
+      const fileURL = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = fileURL;
+      a.download = `${reportType}-report-${Date.now()}.${format === "pdf" ? "pdf" : "xlsx"}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(fileURL);
+
+      toast({
+        title: `${format.toUpperCase()} Export Ready`,
+        description: "Your file has been downloaded.",
+      });
+    } catch (err) {
+      console.error("Export error:", err);
+      toast({
+        title: "Export Failed",
+        description: "Something went wrong while exporting.",
+        variant: "destructive",
+      });
+    }
+  },
+  [toast]
+);
+
+
+  const value = useMemo(
+    () => ({
+      beds,
+      patients,
+      bloodStock,
+      setBeds,
+      setPatients,
+      setBloodStock,
+      exportReport,
+    }),
+    [beds, patients, bloodStock, exportReport]
+  );
 
   return (
-    <HospitalContext.Provider value={value}>
-      {children}
-    </HospitalContext.Provider>
+    <HospitalContext.Provider value={value}>{children}</HospitalContext.Provider>
   );
 };
