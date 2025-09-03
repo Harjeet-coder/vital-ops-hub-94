@@ -4,9 +4,41 @@ import { BedOccupancyChart } from "./BedOccupancyChart";
 import { Bed, Users, Activity, Heart, TrendingUp, Calendar, BarChart3, Monitor } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import dashboardHero from "@/assets/dashboard-hero.jpg";
 
 export function Dashboard() {
+  const [summary, setSummary] = useState({
+    totalBeds: 0,
+    occupiedBeds: 0,
+    availableBeds: 0,
+    icuAvailable: 0,
+  });
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/beds/ward-summary");
+
+        const overall = res.data.overall;
+        const icuWard = res.data.wards.find((w: any) => w.ward === "ICU");
+
+        setSummary({
+          totalBeds: overall.totalCapacity,
+          occupiedBeds: overall.occupiedBeds,
+          availableBeds: overall.availableBeds,
+          icuAvailable: icuWard ? icuWard.availableBeds : 0,
+        });
+      } catch (err) {
+        console.error("Error fetching dashboard summary:", err);
+      }
+    };
+
+    fetchSummary();
+    const interval = setInterval(fetchSummary, 10000); // refresh every 10s
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Hero Section */}
@@ -50,31 +82,31 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Beds"
-          value="196"
+          value={summary.totalBeds.toString()}
           subtitle="Hospital Capacity"
           icon={<Bed className="w-5 h-5" />}
-          trend={{ value: "+2 this week", isPositive: true }}
+          //trend={{ value: "+2 this week", isPositive: true }}
           status="normal"
         />
         <StatCard
           title="Occupied Beds"
-          value="118"
-          subtitle="60% Occupancy"
+          value={summary.occupiedBeds.toString()}
+          subtitle={`${Math.round((summary.occupiedBeds / summary.totalBeds) * 100)}% Occupancy`}
           icon={<Users className="w-5 h-5" />}
-          trend={{ value: "+8 today", isPositive: true }}
+          //trend={{ value: "+8 today", isPositive: true }}
           status="warning"
         />
         <StatCard
           title="Available Beds"
-          value="78"
+          value={summary.availableBeds.toString()}
           subtitle="Immediate Capacity"
           icon={<Activity className="w-5 h-5" />}
-          trend={{ value: "-3 since morning", isPositive: false }}
+          //trend={{ value: "-3 since morning", isPositive: false }}
           status="success"
         />
         <StatCard
           title="Critical Beds"
-          value="5"
+          value={summary.icuAvailable.toString()}
           subtitle="ICU Available"
           icon={<Heart className="w-5 h-5" />}
           status="critical"
