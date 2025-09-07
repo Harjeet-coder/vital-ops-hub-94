@@ -8,6 +8,8 @@ import { BarChart3, TrendingUp, TrendingDown, Calendar, Download, RefreshCw, Act
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import analyticsHero from "@/assets/analytics-hero.jpg";
 
+
+
 // Bed Demand Prediction Data
 const bedDemandData = [
   { day: 'Today', general: 85, icu: 12, emergency: 8, predicted: 105, actual: 105 },
@@ -81,38 +83,6 @@ const Analytics = () => {
                   <span className="text-lg font-semibold">94% Accuracy</span>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Select defaultValue="7">
-                <SelectTrigger className="w-32 bg-white/10 backdrop-blur-sm border-white/20 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">7 Days</SelectItem>
-                  <SelectItem value="14">14 Days</SelectItem>
-                  <SelectItem value="30">30 Days</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh
-              </Button>
-              <Button 
-                variant="outline" 
-                className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
-                onClick={() => {
-                  const blob = new Blob([JSON.stringify({ type: 'Analytics Report', data: 'sample' })], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'analytics-report.pdf';
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
             </div>
           </div>
         </div>

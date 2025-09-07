@@ -227,7 +227,7 @@ const filteredPatients = useMemo(() => {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button>
-                      <Plus className="mr-2 w-4 h-4" />
+                      <Plus className="mr-2 w-4 h-8" />
                       Add New Patient
                     </Button>
                   </DialogTrigger>
@@ -239,7 +239,7 @@ const filteredPatients = useMemo(() => {
                 </Dialog>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="destructive">
+                    <Button variant="danger">
                       <UserPlus className="mr-2 w-4 h-4" />
                       Patient Discharge
                     </Button>

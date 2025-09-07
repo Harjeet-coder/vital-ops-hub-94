@@ -368,8 +368,8 @@ const filteredBeds = useMemo(() => {
                       <span className="text-sm font-medium text-muted-foreground">Ward</span>
                       <span className="text-sm font-semibold text-foreground">{bed.ward}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
-                      <span className="text-sm font-medium text-muted-foreground">Floor</span>
+                   {/* <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
+                     <span className="text-sm font-medium text-muted-foreground">Floor</span>
                       <span className="text-sm font-semibold text-foreground">{bed.floor}</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
@@ -379,7 +379,7 @@ const filteredBeds = useMemo(() => {
                     <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
                       <span className="text-sm font-medium text-muted-foreground">DD Beds</span>
                       <span className="text-sm font-semibold text-primary">{bed.ddBeds}</span>
-                    </div>
+                    </div>*/}
                     {bed.assignedTo && (
                       <div className="flex justify-between items-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-xl">
                         <span className="text-sm font-medium text-muted-foreground">Patient</span>

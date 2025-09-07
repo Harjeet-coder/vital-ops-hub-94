@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { AppSidebar } from "./AppSidebar";
 
 interface MainLayoutProps {
@@ -6,13 +6,17 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <div className="min-h-screen w-full flex bg-background">
-      <AppSidebar />
-      <main className="flex-1 overflow-auto">
-        <div className="p-6">
-          {children}
-        </div>
+    <div className="min-h-screen w-full bg-background">
+      <AppSidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <main
+        className={`min-h-screen overflow-auto transition-all duration-500 ${
+          isCollapsed ? "pl-20" : "pl-72"
+        }`}
+      >
+        <div className="p-6">{children}</div>
       </main>
     </div>
   );
